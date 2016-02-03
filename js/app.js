@@ -1,134 +1,128 @@
 /*
-The Enemy function, which initiates the Enemy by:
-Loading the image by setting this.sprite to the appropriate image in the image folder (already provided)
-Setting the Enemy initial location (you need to implement)
-Setting the Enemy speed (you need to implement)
-The update method for the Enemy
-Updates the Enemy location (you need to implement)
-Handles collision with the Player (you need to implement)
-You can add your own Enemy methods as needed
-You will also need to implement the Player class, and you can use the Enemy class as an example on how to get started. At minimum you should implement the following:
-The Player function, which initiates the Player by:
-Loading the image by setting this.sprite to the appropriate image in the image folder (use the code from the Enemy function as an example on how to do that)
-Setting the Player initial location
-The update method for the Player (can be similar to the one for the Enemy)
-The render method for the Player (use the code from the render method for the Enemy)
-The handleInput method, which should receive user input, allowedKeys (the key which was pressed) and move the player according to that input. In particular:
-Left key should move the player to the left, right key to the right, up should move the player up and down should move the player down.
-Recall that the player cannot move off screen (so you will need to check for that and handle appropriately).
-If the player reaches the water the game should be reset by moving the player back to the initial location (you can write a separate reset Player method to handle that).
-You can add your own Player methods as needed.
-Once you have completed implementing the Player and Enemy, you should instantiate them by:
-Creating a new Player object
-Creating several new Enemies objects and placing them in an array called allEnemies
+* Udacity front-web nanodegree project 3: Frogger
+* Author: Taha Pourjalali
+*
 */
-// pseudoclassical inheritance
+
+var numRows = 6,
+	numCols = 5,
+	rowHeight = 83,
+	colWidth = 101 ;
+// helper method for pseudoclassical inheritance
 // subClass will inherit from superClass
 var inherit = function(subClass,superClass) {
    subClass.prototype = Object.create(superClass.prototype); // delegate to prototype
    subClass.prototype.constructor = subClass; // set constructor on prototype
 }
+
+//the super class for Player and Enemy
 var Agent = function() {
 	this.sprite= "" ; 
 	this.x =0 ;
 	this.y =0 ;
 }
+//the update method updates the Agent's location, based on time and the agent's speed. 
 Agent.prototype.update = function(dt){console.log("Agent update running \n" );};
+//the render method draws the agent on the canvas. 
 Agent.prototype.render = function(){
 	ctx.drawImage(Resources.get(this.sprite), this.x, this.y)  ; 
 };
 // Enemies our player must avoid
 var Enemy = function() {
 	Agent.call(this); 
-	this.y = 202;
+	//the initial y coordinate of all enemies is 2nd row (or somewhere close to it!)
+	this.y = 2* rowHeight;
+	//the bug png address. 
     this.sprite = 'images/enemy-bug.png';
-	this.x = -101; 
-	this.speed = 800 ; 
+	//all enemies initially start outside the canvas.
+	this.x = -colWidth; 
+	//the first pass will be invisible!
+	this.speed = 80000 ; 
 };
 inherit(Enemy, Agent);
-
+//reset function is called when a bug exits the canvas.
 Enemy.prototype.reset = function(){
-	this.y = ( Math.floor(Math.random() *4)+1.5 )* 83;
-	this.speed = (Math.random() * 6 +4)* 101;
+	//place the bug in a random row
+	this.y = ( Math.floor(Math.random() *4)+1.5 )* rowHeight;
+	//give bug a random speed (though in a defined range)
+	this.speed = (Math.random() * 6 +4)* colWidth;
+	//place the bug some distance outside canvas. This practically delays the respawn of the bug. 
 	this.x =  - (Math.random() *5 +0.5)*  this.speed ; 
 } ; 
 // Update the enemy's position, required method for game
 // Parameter: dt, a time delta between ticks
 Enemy.prototype.update = function(dt) {
-	if(this.x >= 101 * 5){
+	if(this.x >= colWidth * 5){
 		this.reset();
 		return; 
 	}
 	this.x += this.speed * dt;
-    // You should multiply any movement by the dt parameter
-    // which will ensure the game runs at the same speed for
-    // all computers.
 };
 
-// Draw the enemy on the screen, required method for game
-//col * 101, row * 83
 
-// Now write your own player class
-// This class requires an update(), render() and
-// a handleInput() method.
 var Player = function(){
 	Agent.call(this);
+	//the player png file
 	this.sprite = 'images/char-boy.png'
 };
 inherit(Player, Agent);
+// handleInput method receives user input, allowedKeys (the key which was pressed) and moves the player according to that input..
 Player.prototype.handleInput = function(key){
 	switch(key){
 		case 'left': 
-			this.x -= 101; 
+			this.x -= colWidth; 
 			break ; 
 		case 'right':
-			this.x += 101;
+			this.x += colWidth;
 			break;
 		case 'up':
-			this.y -= 83; 
+			this.y -= rowHeight; 
 			break; 
 		case 'down':
-			this.y += 83 ; 
+			this.y += rowHeight ; 
 			break; 
 	}
-	if(this.y > 415){
-		this.y = 390 ; 
+	//the player cannot move off screen
+	if(this.y > (numRows -1 )* rowHeight -25){
+		this.y = (numRows -1 )* rowHeight -25 ; 
 	}
-	if(this.x >404 )
-		this.x = 404 ; 
+	if(this.x >(numCols -1)*colWidth )
+		this.x = (numCols -1)*colWidth  ; 
 	if(this.x < 0  )
 		this.x =0 ;
 };
+//the reset function brings the player back to its original location
 Player.prototype.reset = function(){
-	this.y = 390 ; 
-	this.x = 2* 101 ;
+	this.y = (numRows -1 )* rowHeight -25 // a little fine adjustment ; 
+	this.x = 2* colWidth ;
 }
+//update the players position when necessary
 Player.prototype.update = function () {
+	//did the player reach water?
 	if(this.y <= 0){
 		this.reset(); 
 	}
 	
 	//collision detection: 
 	allEnemies.forEach(function(enemy){
-		if(enemy.y < this.y+90 && enemy.y > this.y+ 50)
+		if(enemy.y < this.y+90 && enemy.y > this.y+ 50)// leave a little room for error
 			if(enemy.x > this.x-40 && enemy.x < this.x +40){
 				this.reset();
 				return;
 			}
 	}, this);
 }
-// Now instantiate your objects.
-// Place all enemy objects in an array called allEnemies
-// Place the player object in a variable called player
+//variables player and allEnemies are used in engine.js
 var player = new Player(); 
 var allEnemies = [];
-for (var i = 0 ; i < 7; ++i ){
+//lets have 10 enemies
+for (var i = 0 ; i <10; ++i ){
 	allEnemies.push(new Enemy());
 }
 
 
-// This listens for key presses and sends the keys to your
-// Player.handleInput() method. You don't need to modify this.
+// This listens for key presses and sends the keys to the
+// Player.handleInput() method.
 document.addEventListener('keyup', function(e) {
     var allowedKeys = {
         37: 'left',

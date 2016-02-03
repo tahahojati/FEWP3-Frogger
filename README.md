@@ -1,6 +1,9 @@
-frontend-nanodegree-arcade-game
-===============================
+Udacity front-end nano degree project 3:
 
-Students should use this [rubric](https://www.udacity.com/course/viewer/#!/c-nd001/l-2696458597/m-2687128535) for self-checking their submission.
+This project is a replica of the arcade game frogger. For a video of the app in function please refer to https://www.youtube.com/watch?v=SxeHV1kt7iU&feature=youtu.be.
 
-For detailed instructions on how to get started, check out this [guide](https://docs.google.com/document/d/1v01aScPjSWCCWQLIpFqvg3-vXLH2e8_SZQKC8jNO0Dc/pub?embedded=true).
+To run the project simply download or clone the files using 'git clone https://github.com/tahahojati/FEWP3-Frogger' and open index.html in your prefered browser.  
+
+How to play:
+Use the up, down, left, and right arrows on your keyboard to control the little boy. Avoid the bugs and reach the river!
+
