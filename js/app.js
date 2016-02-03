@@ -49,7 +49,7 @@ inherit(Enemy, Agent);
 
 Enemy.prototype.reset = function(){
 	this.y = ( Math.floor(Math.random() *4)+1.5 )* 83;
-	this.speed = (Math.random() * 8 +4)* 101;
+	this.speed = (Math.random() * 6 +4)* 101;
 	this.x =  - (Math.random() *5 +0.5)*  this.speed ; 
 } ; 
 // Update the enemy's position, required method for game
@@ -101,12 +101,21 @@ Player.prototype.handleInput = function(key){
 };
 Player.prototype.reset = function(){
 	this.y = 390 ; 
-	this.x = 2* 101
+	this.x = 2* 101 ;
 }
 Player.prototype.update = function () {
 	if(this.y <= 0){
 		this.reset(); 
 	}
+	
+	//collision detection: 
+	allEnemies.forEach(function(enemy){
+		if(enemy.y < this.y+90 && enemy.y > this.y+ 50)
+			if(enemy.x > this.x-40 && enemy.x < this.x +40){
+				this.reset();
+				return;
+			}
+	}, this);
 }
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
