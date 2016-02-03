@@ -31,23 +31,24 @@ var inherit = function(subClass,superClass) {
 var Agent = function() {
 	this.sprite= "" ; 
 	this.x =0 ;
-	this.y =202 ;
+	this.y =0 ;
 }
-Agent.prototype.update = function(dt){};
-
+Agent.prototype.update = function(dt){console.log("Agent update running \n" );};
+Agent.prototype.render = function(){
+	ctx.drawImage(Resources.get(this.sprite), this.x, this.y)  ; 
+};
 // Enemies our player must avoid
 var Enemy = function() {
 	Agent.call(this); 
+	this.y = 202;
     this.sprite = 'images/enemy-bug.png';
 	this.x = -101; 
 	this.speed = 800 ; 
 };
 inherit(Enemy, Agent);
-Enemy.prototype.render = function (){
-	ctx.drawImage(Resources.get(this.sprite), this.x, this.y)  ; 
-};
+
 Enemy.prototype.reset = function(){
-	this.y = ( Math.floor(Math.random() *5)+1.5 )* 83;
+	this.y = ( Math.floor(Math.random() *4)+1.5 )* 83;
 	this.speed = (Math.random() * 8 +4)* 101;
 	this.x =  - (Math.random() *5 +0.5)*  this.speed ; 
 } ; 
@@ -71,19 +72,48 @@ Enemy.prototype.update = function(dt) {
 // This class requires an update(), render() and
 // a handleInput() method.
 var Player = function(){
-	
+	Agent.call(this);
+	this.sprite = 'images/char-boy.png'
 };
 inherit(Player, Agent);
-Player.prototype.handleInput = function(){
-	
+Player.prototype.handleInput = function(key){
+	switch(key){
+		case 'left': 
+			this.x -= 101; 
+			break ; 
+		case 'right':
+			this.x += 101;
+			break;
+		case 'up':
+			this.y -= 83; 
+			break; 
+		case 'down':
+			this.y += 83 ; 
+			break; 
+	}
+	if(this.y > 415){
+		this.y = 390 ; 
+	}
+	if(this.x >404 )
+		this.x = 404 ; 
+	if(this.x < 0  )
+		this.x =0 ;
 };
-Player.prototype.render = function(){}
+Player.prototype.reset = function(){
+	this.y = 390 ; 
+	this.x = 2* 101
+}
+Player.prototype.update = function () {
+	if(this.y <= 0){
+		this.reset(); 
+	}
+}
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
 var player = new Player(); 
 var allEnemies = [];
-for (var i = 0 ; i < 8; ++i ){
+for (var i = 0 ; i < 7; ++i ){
 	allEnemies.push(new Enemy());
 }
 
